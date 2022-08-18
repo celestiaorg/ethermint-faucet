@@ -285,6 +285,8 @@ faucetQueue = await getFaucetQueue();
                         amount: constants.AMOUNT,
                     }, ],
                 }));
+                console.log(wallet)
+                console.log(addr)
                 const msgs = msg(addr, outputs);
                 await processTransaction(wallet,addr,msgs)
 
