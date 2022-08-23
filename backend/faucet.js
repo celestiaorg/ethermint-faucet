@@ -391,4 +391,4 @@ async function getQueue() {
     return getQueue;
 }
 
-module.exports = {runner, handleFaucetRequest,handleFaucetVote,MnemonicWalletWithPassphrase,processTransaction,getQueue};
+module.exports = {runner, handleFaucetRequest,processTransaction,getQueue};
