@@ -20,36 +20,8 @@ const {
     fromPartial
 } = require("cosmjs-types/cosmos/bank/v1beta1/tx");
 const Long = require("long")
-
-
-/*
-OsmoJS test for voting
-*/
-const  { getSigningOsmosisClient, osmosis, cosmos } =  require('osmojs');
-//const { SigningStargateClient } = require('@cosmjs/stargate');
-
-
- const messages = {
-    // osmosis
-    // ...osmosis.gamm.v1beta1.MessageComposer.withTypeUrl,
-    // ...osmosis.superfluid.MessageComposer.withTypeUrl,
-    // ...osmosis.lockup.MessageComposer.withTypeUrl,
-    // cosmos
-    // ...cosmos.distribution.v1beta1.MessageComposer.fromPartial,
-    // ...cosmos.bank.v1beta1.MessageComposer.fromPartial,
-    // ...cosmos.staking.v1beta1.MessageComposer.fromPartial,
-    ...cosmos.gov.v1beta1.MessageComposer.fromPartial
-  };
-
-
-
-  
-//   const osmoClient = SigningStargateClient = await getSigningOsmosisClient({
-//     rpcEndpoint: rpc,
-//     signer // OfflineSigner
-//   });
-
-
+import { broadcast, getSender, signTransaction } from "@hanchon/evmos-ts-wallet"
+import { ethToEthermint } from '@tharsis/address-converter'
 
 /*
     Redis Connection
@@ -91,24 +63,6 @@ function msg(inputs, outputs) {
     }
 }
 
-/*
-    Compose vote message
- */
-    function votemsg(inputs, outputs) {
-        return {
-            typeUrl: msgSendTypeUrl,
-            value: MsgMultiSend.fromPartial({
-                inputs: [{
-                    address: trimWhiteSpaces(inputs), //fromAddress
-                    coins: [{
-                        denom: constants.DENOM,
-                        amount: (outputs.length * parseInt(constants.AMOUNT)).toString(),
-                    }, ],
-                }, ],
-                outputs: outputs, //toAddress
-            }),
-        }
-    }
 
 /*
     Sign and broadcast message
@@ -143,36 +97,10 @@ async function processTransaction(wallet,addr,msgs){
     }
 }
 
-async function voteTransaction(wallet,addr,msgs){
-    try {
-        let faucetQueue
-        faucetQueue = await getFaucetQueue();
-        const response = await signAndBroadcast(
-            wallet,
-            addr,
-            [msgs], {
-                "amount": [{
-                    amount: (parseInt(constants.gas) * GasPrice.fromString(constants.gas_price).amount).toString(),
-                    denom: constants.DENOM
-                }],
-                "gas": constants.gas
-            },
-            "Thanks for using Osmosis Faucet"
-        );
-        faucetQueue.forEach(function(address) {
-            removeFromQueue(address)
-        })
-    } catch (err) {
-        console.error('Unable to process transaction')
-        throw err
-    }
-}
-
-
 async function MnemonicWalletWithPassphrase(mnemonic) {
     const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic, {
         prefix: constants.prefix,
-        bip39Password: '',
+        // bip39Password: '',
         hdPaths: [stringToPath(constants.HD_PATH)]
     });
     const [firstAccount] = await wallet.getAccounts();
