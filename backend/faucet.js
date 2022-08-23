@@ -237,8 +237,7 @@ let faucetQueue
 faucetQueue = await getFaucetQueue();
         if (faucetQueue.length > 0) {
             try {
-                let [wallet, addr] = await Wallet.fromMnemonic(mnemonic)
-                // let [wallet, addr] = await MnemonicWalletWithPassphrase(mnemonic);
+                let wallet = await Wallet.fromMnemonic(mnemonic)
                 let outputs = [];
                 faucetQueue.forEach(receiver => outputs.push({
                     address: trimWhiteSpaces(receiver),
@@ -247,8 +246,8 @@ faucetQueue = await getFaucetQueue();
                         amount: constants.AMOUNT,
                     }, ],
                 }));
-                console.log(wallet)
-                console.log(addr)
+                console.log("wallet: ", wallet)
+                console.log("ethermint address: ", ethToEthermint(wallet.address))
                 const msgs = msg(addr, outputs);
                 await processTransaction(wallet,addr,msgs)
 
