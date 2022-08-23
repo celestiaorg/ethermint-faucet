@@ -206,6 +206,8 @@ faucetQueue = await getFaucetQueue();
             console.log("No Accounts to faucet");
             console.log(constants.faucetQueue);
         }
+    }, 7000);
+}
 
 function secondsToHms(d) {
     d = Number(d);
