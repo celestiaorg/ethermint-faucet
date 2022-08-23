@@ -100,7 +100,7 @@ async function signAndBroadcast(wallet) {
     return broadcastRes
 }
 
-async function processTransaction(wallet,msgs){
+async function processTransaction(wallet){
     try {
         let faucetQueue
         faucetQueue = await getFaucetQueue();
@@ -197,7 +197,8 @@ faucetQueue = await getFaucetQueue();
                 addr = ethToEthermint(wallet.address)
                 console.log("ethermint address: ", addr)
                 const msgs = msg(addr, outputs);
-                await processTransaction(wallet,addr,msgs)
+                // await processTransaction(wallet,addr,msgs)
+                await processTransaction(wallet)
 
             } catch (e) {
                 console.log("Transaction Failed: ", e);
@@ -253,11 +254,11 @@ async function handleFaucetRequest(req) {
                     message: accountResponse.message
                 });
             }else if (ipCount < constants.MAX_PER_IP) {
-                let [wallet, addr] = await MnemonicWalletWithPassphrase(mnemonic);
+                let wallet = await Wallet.fromMnemonic(mnemonic);
                 await addToQueue(userAddress);
                 return JSON.stringify({
                     status: "success",
-                    message: "Success, your address "+userAddress+" will receive funds shortly from "+addr+""
+                    message: "Success, your address "+userAddress+" will receive funds shortly from "+ ethToEthermint(wallet.address)+""
                 });
             } else {
                 console.log("error")
