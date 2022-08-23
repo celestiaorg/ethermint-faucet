@@ -20,8 +20,10 @@ const {
     fromPartial
 } = require("cosmjs-types/cosmos/bank/v1beta1/tx");
 const Long = require("long")
-// import { broadcast, getSender, signTransaction } from "@hanchon/evmos-ts-wallet"
-// import { ethToEthermint } from '@tharsis/address-converter'
+const { broadcast, getSender, signTransaction } = require("@hanchon/evmos-ts-wallet")
+const { ethToEthermint } = require('@tharsis/address-converter')
+const { createMessageSend } = require("@tharsis/transactions")
+
 
 /*
     Redis Connection
@@ -71,23 +73,52 @@ async function signAndBroadcast(wallet, signerAddress, msgs, fee, memo = '') {
     const cosmJS = await SigningStargateClient.connectWithSigner(rpc, wallet);
     return await cosmJS.signAndBroadcast(signerAddress, msgs, fee, memo); //DeliverTxResponse, 0 iff success
 }
+async function signAndBroadcast2(wallet) {
+    const localnetChain = {
+        chainId: 69420,
+        cosmosChainId: "opti_69420-1"
+    }
+    const localnetFee = {
+        amount: "1000",
+        denom: "aphoton",
+        gas: "200000"
+    }
+
+    const sender = await getSender(wallet, "http://localhost:1318")
+    const txSimple = createMessageSend(
+        localnetChain,
+        sender,
+        localnetFee,
+        '',
+        {
+            destinationAddress: 'ethm1ft8d54035h04zvftqwv6vswnp8rzyc3hly4qpw',
+            amount: '10000',
+            denom: 'aphoton',
+        },
+    )
+    const resKeplr = await signTransaction(wallet, txSimple, 'BROADCAST_MODE_SYNC')
+    const broadcastRes = await broadcast(resKeplr, "http://localhost:1318")
+    console.log(broadcastRes)
+    return broadcastRes
+}
 
 async function processTransaction(wallet,addr,msgs){
     try {
         let faucetQueue
         faucetQueue = await getFaucetQueue();
-        const response = await signAndBroadcast(
-            wallet,
-            addr,
-            [msgs], {
-                "amount": [{
-                    amount: (parseInt(constants.gas) * GasPrice.fromString(constants.gas_price).amount).toString(),
-                    denom: constants.DENOM
-                }],
-                "gas": constants.gas
-            },
-            "Thanks for using Osmosis Faucet"
-        );
+        const response = await signAndBroadcast2(wallet); 
+        // const response = await signAndBroadcast(
+        //     wallet,
+        //     addr,
+        //     [msgs], {
+        //         "amount": [{
+        //             amount: (parseInt(constants.gas) * GasPrice.fromString(constants.gas_price).amount).toString(),
+        //             denom: constants.DENOM
+        //         }],
+        //         "gas": constants.gas
+        //     },
+        //     "Thanks for using Osmosis Faucet"
+        // );
         faucetQueue.forEach(function(address) {
             removeFromQueue(address)
         })
