@@ -71,11 +71,7 @@ function msg(inputs, outputs) {
 /*
     Sign and broadcast message
  */
-async function signAndBroadcast(wallet, signerAddress, msgs, fee, memo = '') {
-    const cosmJS = await SigningStargateClient.connectWithSigner(rpc, wallet);
-    return await cosmJS.signAndBroadcast(signerAddress, msgs, fee, memo); //DeliverTxResponse, 0 iff success
-}
-async function signAndBroadcast2(wallet) {
+async function signAndBroadcast(wallet) {
     const localnetChain = {
         chainId: 69420,
         cosmosChainId: "opti_69420-1"
@@ -108,7 +104,7 @@ async function processTransaction(wallet,msgs){
     try {
         let faucetQueue
         faucetQueue = await getFaucetQueue();
-        const response = await signAndBroadcast2(wallet); 
+        const response = await signAndBroadcast(wallet);
         // const response = await signAndBroadcast(
         //     wallet,
         //     addr,
@@ -128,16 +124,6 @@ async function processTransaction(wallet,msgs){
         console.error('Unable to process transaction')
         throw err
     }
-}
-
-async function MnemonicWalletWithPassphrase(mnemonic) {
-    const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic, {
-        prefix: constants.prefix,
-        // bip39Password: '',
-        hdPaths: [stringToPath(constants.HD_PATH)]
-    });
-    const [firstAccount] = await wallet.getAccounts();
-    return [wallet, firstAccount.address];
 }
 
 async function validateAccount(userAddress){
@@ -163,19 +149,6 @@ async function getFaucetQueue() {
     }
 }
 
-async function getVoteQueue() {
-    let voteQueue
-    try {
-        voteQueue = await client.lrange('voteQueue',0, -1)
-        console.log("Getting Voting Queue")
-        console.log(voteQueue);
-        return voteQueue
-    } catch (err) {
-        console.error('Unable to get vote queue')
-        throw err
-    }
-}
-
 async function addToQueue(userAddress){
     let addQueue
     try {
@@ -187,37 +160,11 @@ async function addToQueue(userAddress){
     }
 }
 
-async function addToVoteQueue(codeId){
-    let addQueue
-    try {
-        addQueue = await client.lpush(['voteQueue',codeId])
-        console.log(codeId, "Vote added - Count:",+addQueue);
-    } catch (err) {
-        console.error('addQueue: could not increment key')
-        throw err
-    }
-}
-
 async function removeFromQueue(address) {
     console.log("Removing address"+address)
     let removeFromQueue
     try {
         removeFromQueue = await client.lrem('faucetQueue',-1,address)
-    console.log("removeFromQueue")
-    console.log(removeFromQueue);
-} catch (err) {
-        console.error('isOverLimit: could not increment key')
-        throw err
-    }
-
-}
-
-
-async function removeFromVotingQueue(codeId) {
-    console.log("Removing code id"+codeId)
-    let removeFromQueue
-    try {
-        removeFromQueue = await client.lrem('voteQueue',-1,codeId)
     console.log("removeFromQueue")
     console.log(removeFromQueue);
 } catch (err) {
