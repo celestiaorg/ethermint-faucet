@@ -81,30 +81,33 @@ async function signAndBroadcast(wallet) {
         denom: "aphoton",
         gas: "200000"
     }
-
-    const sender = await getSender(wallet, "http://localhost:1318")
-    const txSimple = createMessageSend(
-        localnetChain,
-        sender,
-        localnetFee,
-        '',
-        {
-            destinationAddress: 'ethm1ft8d54035h04zvftqwv6vswnp8rzyc3hly4qpw',
-            amount: '10000',
-            denom: 'aphoton',
-        },
-    )
-    const resKeplr = await signTransaction(wallet, txSimple, 'BROADCAST_MODE_SYNC')
-    const broadcastRes = await broadcast(resKeplr, "http://localhost:1318")
-    console.log(broadcastRes)
-    return broadcastRes
+    try {
+        const sender = await getSender(wallet, "http://localhost:1318")
+        const txSimple = createMessageSend(
+            localnetChain,
+            sender,
+            localnetFee,
+            '',
+            {
+                destinationAddress: 'ethm1ft8d54035h04zvftqwv6vswnp8rzyc3hly4qpw',
+                amount: '10000',
+                denom: 'aphoton',
+            },
+        )
+        const resKeplr = await signTransaction(wallet, txSimple, 'BROADCAST_MODE_SYNC')
+        const broadcastRes = await broadcast(resKeplr, "http://localhost:1318")
+        console.log(broadcastRes)
+    }
+    catch (err) {
+        console.log('Error', err)
+    }
 }
 
 async function processTransaction(wallet){
     try {
         let faucetQueue
         faucetQueue = await getFaucetQueue();
-        const response = await signAndBroadcast(wallet);
+        await signAndBroadcast(wallet);
         // const response = await signAndBroadcast(
         //     wallet,
         //     addr,
@@ -117,9 +120,9 @@ async function processTransaction(wallet){
         //     },
         //     "Thanks for using Osmosis Faucet"
         // );
-        faucetQueue.forEach(function(address) {
-            removeFromQueue(address)
-        })
+        // faucetQueue.forEach(function(address) {
+        //     removeFromQueue(address)
+        // })
     } catch (err) {
         console.error('Unable to process transaction')
         throw err
