@@ -104,7 +104,7 @@ async function signAndBroadcast2(wallet) {
     return broadcastRes
 }
 
-async function processTransaction(wallet,addr,msgs){
+async function processTransaction(wallet,msgs){
     try {
         let faucetQueue
         faucetQueue = await getFaucetQueue();
@@ -247,7 +247,8 @@ faucetQueue = await getFaucetQueue();
                     }, ],
                 }));
                 console.log("wallet: ", wallet)
-                console.log("ethermint address: ", ethToEthermint(wallet.address))
+                addr = ethToEthermint(wallet.address)
+                console.log("ethermint address: ", addr)
                 const msgs = msg(addr, outputs);
                 await processTransaction(wallet,addr,msgs)
 
