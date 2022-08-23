@@ -23,6 +23,8 @@ const Long = require("long")
 const { broadcast, getSender, signTransaction } = require("@hanchon/evmos-ts-wallet")
 const { ethToEthermint } = require('@tharsis/address-converter')
 const { createMessageSend } = require("@tharsis/transactions")
+const { Wallet } = require("@ethersproject/wallet")
+
 
 
 /*
@@ -235,7 +237,8 @@ let faucetQueue
 faucetQueue = await getFaucetQueue();
         if (faucetQueue.length > 0) {
             try {
-                let [wallet, addr] = await MnemonicWalletWithPassphrase(mnemonic);
+                let [wallet, addr] = await Wallet.fromMnemonic(mnemonic)
+                // let [wallet, addr] = await MnemonicWalletWithPassphrase(mnemonic);
                 let outputs = [];
                 faucetQueue.forEach(receiver => outputs.push({
                     address: trimWhiteSpaces(receiver),
