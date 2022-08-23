@@ -207,70 +207,6 @@ faucetQueue = await getFaucetQueue();
             console.log(constants.faucetQueue);
         }
 
-/*
-Voting Queue
-*/
-
-let voteQueue
-voteQueue = await getVoteQueue();
-
-if (voteQueue.length > 0) {
-    try {
-        let [wallet, addr] = await MnemonicWalletWithPassphrase(valMnemonic);
-
-        for (const codeId of voteQueue) {
-
-            console.log("Voting for"+codeId);
-
-                  const voteMsg = messages.vote({
-                    proposalId: ""+codeId+"",
-                    voter: addr,
-                    option: 1,
-                  });
-
-                  console.log(voteMsg)
-                  
-                  try {
-                    const response = await signAndBroadcast(
-                        wallet,
-                        addr,
-                        [voteMsg],
-                        {
-                            "amount": [{
-                                amount: (parseInt(constants.gas) * GasPrice.fromString(constants.gas_price).amount).toString(),
-                                denom: constants.DENOM
-                            }],
-                            "gas": constants.gas
-                        },
-                        "Thanks for using Osmosis Faucet"
-                    );
-                        console.log(response)
-                        console.log(response)
-        
-                        
-                } catch (err) {
-                    console.error('Unable to process transaction')
-                    throw err
-                }
-
-            removeFromVotingQueue(codeId)
-        };
-     
-       // const msgs = votemsg(addr);
-       // await voteTransaction(wallet,addr,msgs)
-
-    } catch (e) {
-        console.log("Transaction Failed: ", e);
-    }   
-
-} else {
-    console.log("No Accounts to faucet");
-    console.log(constants.faucetQueue);
-}
-
-    }, 7000);
-}
-
 function secondsToHms(d) {
     d = Number(d);
     let h = Math.floor(d / 3600);
@@ -325,52 +261,6 @@ async function handleFaucetRequest(req) {
                 console.log("error")
                 console.log(accountResponse);
                 return JSON.stringify({status: "error", message: "Your account cannot get funds at this time. "
-                });
-            }
-        }
-    } catch (e) {
-        console.log(e);
-        return JSON.stringify({
-            status: "error",
-            message: e.toString()
-        });
-    }
-
-}
-
-
-async function handleFaucetVote(req) {
-    let codeId = req.body.code_id
-    let vote = req.body.vote
-   // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-    const ip = "demo"
-    try {
-        let voteCount
-        try {
-            voteCount = await client.incr(ip+'_vote')
-        } catch (err) {
-            console.error('voteCount: could not increment key')
-            throw err
-        }
-        console.log(`${ip} has value: ${voteCount}`)
-
-        if (voteCount > constants.MAX_VOTE_PER_IP) {
-            console.log("voteCount is over limits")
-            client.expire(ip, constants.TIME_LIMIT)
-            return JSON.stringify({
-                status: "error",
-                message: "You have voted " + voteCount + " times. The limit  " + constants.MAX_VOTE_PER_IP + " per " + secondsToHms(constants.TIME_LIMIT) + ""
-            });
-        } else {
-           if (voteCount < constants.MAX_VOTE_PER_IP) {
-                await addToVoteQueue(codeId);
-                return JSON.stringify({
-                    status: "success",
-                    message: "Success, your contract "+codeId+" will receive a vote shortly from the faucet"
-                });
-            } else {
-                console.log("error")
-                return JSON.stringify({status: "error", message: "Your cannot vote at this time. "
                 });
             }
         }
