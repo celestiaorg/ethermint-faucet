@@ -20,7 +20,7 @@
     "cosmwasm": "^1.1.1",
     "dotenv": "^16.0.1",
     "pinia": "^2.0.14",
-    "vue": "^3.2.33",
+    "vue": "^3.3.4",
     "vue-router": "^4.0.13"
   },
   "devDependencies": {
