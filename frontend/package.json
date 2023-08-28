@@ -21,7 +21,7 @@
     "dotenv": "^16.0.1",
     "pinia": "^2.0.14",
     "vue": "^3.2.33",
-    "vue-router": "^4.0.13"
+    "vue-router": "^4.2.4"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.0",
