@@ -10,7 +10,7 @@
     "@coreui/vue": "^4.3.0",
     "@cosmjs/amino": "^0.28.4",
     "@cosmjs/crypto": "^0.28.4",
-    "@cosmjs/proto-signing": "^0.28.4",
+    "@cosmjs/proto-signing": "^0.31.0",
     "@cosmjs/stargate": "^0.28.4",
     "animate.css": "^4.1.1",
     "base-64": "^1.0.0",
